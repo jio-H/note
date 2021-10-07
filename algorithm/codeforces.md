@@ -1894,3 +1894,222 @@ int main() {
 
 ```
 
+
+
+
+
+# [Codeforces Round #746 (Div. 2)](https://codeforces.com/contest/1592)
+
+
+
+## [A. Gamer Hemose](https://codeforces.com/contest/1592/problem/A)
+
+### 题意：
+
+一个 $Boss$ 的血量为m，有n把武器，每次能够使用一把武器，每把武器不能连续使用，问最少要几次才能杀掉$Boss$
+
+### 思路：
+
+选两个伤害最大的武器，交替使用。
+
+### 代码：
+
+```cpp
+#include <bits/stdc++.h>
+
+using namespace std;
+typedef long long ll;
+const int N = 1e5+10;
+const int mod = 1e9+7;
+
+ll a[N];
+
+int main() {
+#ifndef ONLINE_JUDGE
+    freopen("in.txt", "r", stdin);
+    freopen("out.txt", "w", stdout);
+#endif
+    int  t;
+    scanf("%d", &t);
+    while(t--) {
+        int n, m;
+        cin >> n >> m;
+        for(int i=1; i<=n; i++) {
+            cin >> a[i];
+        }
+        sort(a+1, a+1+n, greater<int>());
+        int x = a[1], y = a[2];
+        int ans = m / (x + y) * 2, tmp = m % (x + y);
+        if(tmp > 0) {
+            if(tmp <= x) ans++;
+            else ans += 2;
+        }
+        cout << ans << endl;
+    }
+}
+```
+
+
+
+
+
+
+
+## [B. Hemose Shopping](https://codeforces.com/contest/1592/problem/B)
+
+### 题意：
+
+给出一个数组$a$，两个整数$n$，$x$，你能交换任意的满足$1\le i,j \le n$且$|i-j|\ge x$的$a_i,a_j$，问最后能否将序列排序。
+
+### 思路：
+
+将能够交换的数据放在同一堆，我们能够发现，当$n/x\ge 2$时，所有数一定在同一堆。
+
+否则，只有中间一段数据是不能交换的，所以我们要$check$排序完后的序列，在中间这一段是不是完全相等，是的话，说明能够排好序，否则不能。
+
+### 代码：
+
+```cpp
+#include <bits/stdc++.h>
+
+using namespace std;
+typedef long long ll;
+const int N = 1e5+10;
+const int mod = 1e9+7;
+
+int a[N], b[N], n, m;
+
+bool check() {
+    int x = n-m;
+    for(int i=x+1; i<1+m; i++) {
+        if(a[i] != b[i]) return false;
+    }
+    return true;
+}
+int main() {
+#ifndef ONLINE_JUDGE
+    freopen("in.txt", "r", stdin);
+    freopen("out.txt", "w", stdout);
+#endif
+    int  t;
+    scanf("%d", &t);
+    while(t--) {
+        cin >> n >> m;
+        for(int i=1; i<=n; i++) {
+            cin >> a[i];
+            b[i] = a[i];
+        }
+        sort(a+1, a+1+n);
+        if(n / m >= 2) {
+            cout << "YES\n";
+        }
+        else {
+            if(check()) cout << "YES\n";
+            else cout << "NO\n";
+        }
+    }
+}
+```
+
+
+
+
+
+
+
+## [C. Bakry and Partitioning](https://codeforces.com/contest/1592/problem/C)
+
+### 题意：
+
+给出一棵n个节点的树，每个点都有一个权值，树的权值为每个点权值的异或和，切割$x$条边($x\in[1,k-1]$)
+
+问是否存在一种方法使得切割出来的每个树的权值都相等。
+
+### 思路：
+
+首先我们考虑切割前的树的权值为$0$，可以想到这是一定有解的。
+
+割前树的权值为m（$m\neq 0$），如果有解，那么一定可以切割成三棵树，每棵树的权值都是$m$。
+
+做法：
+
+用一个数组$b$表示权值，$b_i$表示以$i$为根节点的子树的权值。
+
+$dfs$遍历整颗树，找到某个节点存在两个子树的权值是m，或者当前节点的权值是$0$，存在至少一个子树的权值是m。
+
+否则，不存在。
+
+（补充：注意输入的k，最多只能删除$k-1$条边）
+
+### 代码：
+
+```cpp
+#include <bits/stdc++.h>
+
+using namespace std;
+typedef long long ll;
+const int N = 2e5+10;//双向边，所以开两倍。
+const int mod = 1e9+7;
+
+int a[N], b[N], n, m, resu;
+
+int head[N], Ne[N], to[N], cnt = 0;
+void add(int x, int y) {
+    to[++cnt] = y;
+    Ne[cnt] = head[x];
+    head[x] = cnt;
+}
+
+int f = 0;
+
+bool dfs2(int x, int fa) {
+    int tot = 0;
+    b[x] = a[x];
+    for(int i=head[x]; i; i=Ne[i]) {
+        if(to[i] == fa) continue;
+        if(dfs2(to[i], x)) tot++;
+        b[x] ^= b[to[i]];
+    }
+    if(tot >= 2 || (tot == 1 && b[x] == 0)) {
+        f = 1;
+    }
+    if(tot >= 1 || (b[x] == resu)) return true;
+    else return false;
+}
+bool solve2() {
+    dfs2(1, -1);
+    if(f) return true;
+    return false;
+}
+int main() {
+#ifndef ONLINE_JUDGE
+    freopen("in.txt", "r", stdin);
+    freopen("out.txt", "w", stdout);
+#endif
+    int  t;
+    scanf("%d", &t);
+    while(t--) {
+        memset(head, 0, sizeof head);
+        cnt = 0, f = 0, resu = 0;
+        cin >> n >> m;
+        for(int i=1; i<=n; i++) {
+            cin >> a[i];
+            resu ^= a[i];
+        }
+        int x, y;
+        for(int i=1; i<n; i++) {
+            cin >> x >> y;
+            add(x, y);
+            add(y, x);
+        }
+        if(resu == 0) {
+            cout << "YES\n";
+        }
+        else {
+            if(m > 2 && solve2()) cout << "YES\n";
+            else cout << "NO\n";
+        }
+    }
+}
+```
+
