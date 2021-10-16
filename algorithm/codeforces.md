@@ -2113,3 +2113,58 @@ int main() {
 }
 ```
 
+
+
+
+
+
+
+
+
+# [Codeforces Round #745 (Div. 2)](https://codeforces.com/contest/1581)
+
+
+
+
+
+## [A. CQXYM Count Permutations](https://codeforces.com/contest/1581/problem/A)
+
+### 题意：
+
+给出一个长度为$2n$的排列，问有多少种排列方式满足$\sum_{i=1}^{2n-1}[p_i<p_{i+1}]~\ge n$
+
+### 思路：
+
+假设我们已经知道长度为$2n$的结果数，我们再插入$2n+1,2n+2$，
+
+### 代码：
+
+```cpp
+#include<bits/stdc++.h>
+
+using namespace std;
+typedef long long ll;
+const int N = 2e5+10;
+const int mod = 1000000007;
+
+ll ans[N];
+int main() {
+#ifndef ONLINE_JUDGE
+    freopen("in.txt", "r", stdin);
+    freopen("out.txt", "w", stdout);
+#endif
+    ans[1] = 1;
+    for(int i=2; i<N; i++) {
+        ans[i] = ans[i-1] * (((2ll * (i-1) + 1) * (2ll * (i-1) + 2) % mod) % mod) % mod;
+    }
+    int t;
+    cin >> t;
+    while(t--) {
+        int n;
+        cin >> n;
+        cout << ans[n] << endl;
+    }
+    return 0;
+}
+```
+
